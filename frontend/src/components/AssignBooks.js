@@ -75,10 +75,10 @@ const BookAssignment = () => {
       <Typography variant="h6" gutterBottom>
         All Books
       </Typography>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-        {data.books.map((book) => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '3rem' }}>
+        {data.books.map((book, index) => (
           <div key={book.title} ref={(el) => (bookRefs.current[book.title] = el)}>
-            <BookCard book={book} onAdd={addBook} readingList={readingList} onRemove={removeBook} />
+            <BookCard book={book} index={index} onAdd={addBook} readingList={readingList} onRemove={removeBook} />
           </div>
         ))}
       </div>
