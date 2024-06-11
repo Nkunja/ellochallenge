@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, gql } from '@apollo/client';
-import { Container, Typography, Button, TextField, Paper, List, ListItem, ListItemText, CircularProgress } from '@material-ui/core';
+import { Container, Typography, CircularProgress, Button, TextField, Grid } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import BookCard from './BookCard';
 
@@ -21,23 +21,36 @@ const BookAssignment = () => {
   const navigate = useNavigate();
   const bookRefs = useRef({});
 
+  useEffect(() => {
+    const savedReadingList = JSON.parse(localStorage.getItem('readingList')) || [];
+    setReadingList(savedReadingList);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('readingList', JSON.stringify(readingList));
+  }, [readingList]);
+
   const addBook = (book) => {
-    setReadingList([...readingList, book]);
+    setReadingList((prevReadingList) => {
+      const updatedList = [...prevReadingList, book];
+      localStorage.setItem('readingList', JSON.stringify(updatedList));
+      return updatedList;
+    });
   };
 
   const removeBook = (book) => {
-    setReadingList(readingList.filter((b) => b.title !== book.title));
+    setReadingList((prevReadingList) => {
+      const updatedList = prevReadingList.filter((b) => b.title !== book.title);
+      localStorage.setItem('readingList', JSON.stringify(updatedList));
+      return updatedList;
+    });
   };
 
   const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+    const { value } = event.target;
+    setSearchQuery(value);
   };
-
-  const scrollToBook = (title) => {
-    if (bookRefs.current[title]) {
-      bookRefs.current[title].scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  
 
   if (loading) return <CircularProgress />;
   if (error) return <p>Error :(</p>;
@@ -48,41 +61,49 @@ const BookAssignment = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
-        Book Assignment View
-      </Typography>
-      <TextField
-        label="Search Books"
-        value={searchQuery}
-        onChange={handleSearchChange}
-        fullWidth
-        margin="normal"
-      />
-      {searchQuery && (
-        <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
-          <List>
-            {filteredBooks.map((book) => (
-              <ListItem button key={book.title} onClick={() => scrollToBook(book.title)}>
-                <ListItemText primary={book.title} secondary={book.author} />
-              </ListItem>
+      <Grid container spacing={3} alignItems="center">
+        <Grid item xs={8}> 
+          <TextField
+            label="Search Books"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            fullWidth
+            margin="normal"
+          />
+        </Grid>
+        <Grid item xs={4}> 
+          <Button variant="contained" color="primary" onClick={() => navigate('/reading-list')}>
+            View Reading List
+          </Button>
+        </Grid>
+        {searchQuery && (
+          <Grid item xs={12}>
+            <div style={{ maxHeight: 350, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '3rem' }}>
+              {filteredBooks.map((book) => (
+                <div key={book.title} ref={(el) => (bookRefs.current[book.title] = el)}>
+                  <BookCard book={book} onAdd={addBook} readingList={readingList} onRemove={removeBook} />
+                </div>
+              ))}
+            </div>
+          </Grid>
+        )}
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom>
+            All Books
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <div style={{ overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '3rem' }}>
+            {data.books.map((book) => (
+              <div key={book.title} ref={(el) => (bookRefs.current[book.title] = el)}>
+                <BookCard book={book} onAdd={addBook} readingList={readingList} onRemove={removeBook} />
+              </div>
             ))}
-          </List>
-        </Paper>
-      )}
-      <Button variant="contained" color="primary" onClick={() => navigate('/reading-list')}>
-        View Reading List
-      </Button>
-      <Typography variant="h6" gutterBottom>
-        All Books
-      </Typography>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '3rem' }}>
-        {data.books.map((book, index) => (
-          <div key={book.title} ref={(el) => (bookRefs.current[book.title] = el)}>
-            <BookCard book={book} index={index} onAdd={addBook} readingList={readingList} onRemove={removeBook} />
           </div>
-        ))}
-      </div>
+        </Grid>
+      </Grid>
     </Container>
+
   );
 };
 

@@ -6,11 +6,10 @@ const BookCard = ({ book, index, onAdd, onRemove, readingList }) => {
   const isAdded = readingList.some((b) => b.title === book.title);
 
   const getRandomImage = (index) => {
-    if (index >= images.length) {
-      index = Math.floor(Math.random() * images.length);
-    }
-    return images[index];
-  }
+    return images[index % images.length]; // Use modulo to ensure index is within bounds
+  };
+
+  const imageSrc = book.coverPhotoURL || getRandomImage(index);
 
   return (
     <Card style={{ maxHeight: 250 }}>
@@ -18,22 +17,22 @@ const BookCard = ({ book, index, onAdd, onRemove, readingList }) => {
         component="img"
         alt={book.title}
         height="140"
-        image={getRandomImage(index)}
+        image={imageSrc}
         title={book.title}
       />
       <CardContent>
-        <Typography variant="p">{book.title}</Typography>
+        <Typography variant="body1">{book.title}</Typography>
         <Typography variant="body2" color="textSecondary">{book.author}</Typography>
         <div style={{ justifyItems: 'end', width: '100%', display: 'flex' }}>
-        {!isAdded ? (
-          <Button size="small" color="primary" onClick={() => onAdd(book)}>
-            Add
-          </Button>
-        ) : (
-          <Button size="small" color="secondary" onClick={() => onRemove(book)}>
-            Remove
-          </Button>
-        )}
+          {!isAdded ? (
+            <Button size="small" color="primary" onClick={() => onAdd(book)}>
+              Add
+            </Button>
+          ) : (
+            <Button size="small" color="secondary" onClick={() => onRemove(book)}>
+              Remove
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -41,3 +40,4 @@ const BookCard = ({ book, index, onAdd, onRemove, readingList }) => {
 };
 
 export default BookCard;
+

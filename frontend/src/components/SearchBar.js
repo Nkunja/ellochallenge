@@ -13,3 +13,4 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
 };
 
 export default SearchBar;
+
