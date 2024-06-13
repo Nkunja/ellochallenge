@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import { Container, Typography, CircularProgress, Button, TextField, Grid } from '@material-ui/core';
 import { makeStyles, styled } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom';
-import BookCard from './BookCard';
+import DisplayCard from './DisplayCard';
+import DisplayList from './DisplayList';
 
 const GET_BOOKS = gql`
   query Books {
@@ -13,7 +14,7 @@ const GET_BOOKS = gql`
       title
     }
   }
-`
+`;
 
 const useStyles = makeStyles((theme) => ({
   paginationContainer: {
@@ -41,12 +42,11 @@ const Books = ({ readingList, addBook, removeBook }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const navigate = useNavigate();
-  const bookRefs = useRef({});
 
   const handleSearchChange = (event) => {
     const { value } = event.target;
     setSearchQuery(value);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const handlePageChange = (event, newPage) => {
@@ -55,8 +55,8 @@ const Books = ({ readingList, addBook, removeBook }) => {
 
   const handleItemsPerPageChange = (event) => {
     const { value } = event.target;
-    setItemsPerPage(parseInt(value, 10)); 
-    setCurrentPage(1); 
+    setItemsPerPage(parseInt(value, 10));
+    setCurrentPage(1);
   };
 
   const getPaginatedData = (books) => {
@@ -74,7 +74,6 @@ const Books = ({ readingList, addBook, removeBook }) => {
   );
 
   const paginatedBooks = getPaginatedData(filteredBooks);
-
   const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
 
   return (
@@ -105,15 +104,18 @@ const Books = ({ readingList, addBook, removeBook }) => {
               View Reading List
             </Button>
           </Grid>
-          <Grid item xs={12}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '3rem' }}>
-              {paginatedBooks.map((book) => (
-                <div key={`${book.title}-${book.author}`} ref={(el) => (bookRefs.current[`${book.title}-${book.author}`] = el)}>
-                  <BookCard book={book} onAdd={addBook} readingList={readingList} onRemove={removeBook} />
-                </div>
-              ))}
-            </div>
+          <Grid container spacing={3} justifyContent="center">
+            {searchQuery.trim() === '' ? (
+              <Grid item xs={12}>
+                <DisplayCard books={paginatedBooks} addBook={addBook} removeBook={removeBook} readingList={readingList} />
+              </Grid>
+            ) : (
+              <Grid item xs={5}>
+                <DisplayList books={paginatedBooks} addBook={addBook} removeBook={removeBook} readingList={readingList} />
+              </Grid>
+            )}
           </Grid>
+
         </Grid>
       </Container>
       <PaginationContainer>
@@ -142,3 +144,4 @@ const Books = ({ readingList, addBook, removeBook }) => {
 };
 
 export default Books;
+
