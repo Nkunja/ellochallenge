@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from '@material-ui/core/styles';
 import Home from './components/Home';
-import BookAssignment from './components/AssignBooks';
-import ReadingListView from './components/ReadingListView';
+import Books from './components/Books';
+import ReadingList from './components/ReadingList';
 import theme from './theme'; 
 
 const App = () => {
@@ -15,8 +15,9 @@ const App = () => {
   }, []);
 
   const addBook = (book) => {
-    setReadingList([...readingList, book]);
-    localStorage.setItem('readingList', JSON.stringify([...readingList, book]));
+    const updatedList = [...readingList, book];
+    setReadingList(updatedList);
+    localStorage.setItem('readingList', JSON.stringify(updatedList));
   };
 
   const removeBook = (book) => {
@@ -32,9 +33,12 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route
             path="/books"
-            element={<BookAssignment readingList={readingList} addBook={addBook} removeBook={removeBook} />}
+            element={<Books readingList={readingList} addBook={addBook} removeBook={removeBook} />}
           />
-          <Route path="/reading-list" element={<ReadingListView readingList={readingList} onRemove={removeBook} />} />
+          <Route
+            path="/reading-list"
+            element={<ReadingList readingList={readingList} onRemove={removeBook} />}
+          />
         </Routes>
       </Router>
     </ThemeProvider>
