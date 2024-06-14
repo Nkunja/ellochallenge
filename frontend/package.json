@@ -16,8 +16,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "cross-env REACT_APP_GRAPHQL_ENDPOINT=http://localhost:4000/ react-scripts start",
+    "build": "cross-env REACT_APP_GRAPHQL_ENDPOINT=https://ellochallenge.onrender.com/ react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
