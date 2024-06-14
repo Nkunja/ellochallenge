@@ -40,7 +40,7 @@ const Books = ({ readingList, addBook, removeBook }) => {
   const { loading, error, data } = useQuery(GET_BOOKS);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(8);
   const navigate = useNavigate();
 
   const handleSearchChange = (event) => {
@@ -106,7 +106,7 @@ const Books = ({ readingList, addBook, removeBook }) => {
           </Grid>
           <Grid container spacing={3} justifyContent="center">
             {searchQuery.trim() === '' ? (
-              <Grid item xs={12}>
+              <Grid item xs={10}>
                 <DisplayCard books={paginatedBooks} addBook={addBook} removeBook={removeBook} readingList={readingList} />
               </Grid>
             ) : (
